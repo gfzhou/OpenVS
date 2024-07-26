@@ -1,0 +1,66 @@
+#===============================================================================
+# Target proteins and their known binders in the PDBbind core set v.2016.
+# A total of 57 target proteins are included here.
+# The first PDB entry in each line contains the target protein structure used 
+# in the screening power test; while the rest PDB entries contain the known 
+# binders to this target protein, which are ranked by binding affinity in a 
+# descending order. For some target proteins, there are more than five binders. 
+#===============================================================================
+#T    L1    L2    L3    L4    L5    L6    L7    L8    L9    L10
+3ejr  3ejr  3dx2  3d4z  3dx1  1ps3
+3ebp  3ebp  3syr  3g2n  4eky  3l7b
+2vvn  2vvn  2xj7  2wca  2w4x  2w66
+3arp  3arp  3arq  3ary  3arv  3aru
+3gnw  3gnw  4eo8  3cj4  4ih7  4ih5
+1e66  1e66  1h22  1h23  1gpn  1gpk
+3f3e  3f3e  3f3d  4mme  3f3c  3f3a
+2cet  2cet  2j7h  2j78  2cbv  2wbg
+4gid  4gid  2vkm  4djv  3rsx  3udh  2v00
+4pcs  4pcs  2xii  2wvt  4j28  4jfs
+3ge7  3ge7  3gc5  1r5y  1s38  3rr4
+3e93  3e93  3e92  4f9w  2zb1  4dli
+3qqs  3qqs  4gkm  3r88  3twp  4owm
+2r9w  2r9w  4jxs  4kz6  3gr2  3gv9
+2qbp  2qbp  2qbq  2qbr  1bzc  2hb1  
+3ag9  3ag9  1ydt  1q8u  1ydr  1q8t  3ebp
+5dwr  5dwr  4k18  2c3i  3jya  3bgz  3ebp
+4tmn  4tmn  5tmn  1qf1  1z9g  3fcq
+3coy  3coy  3coz  3ivg  4ddh  4ddk
+2fvd  2fvd  1pxn  2xnb  4eor  3pxf  3ebp  2v7a
+4ivc  4ivc  4ivd  4ivb  4e5w  4k77  4ogj  4e6q  4f09  3e5a
+4jia  4jia  4e6q  4hge  4gfm  4f09  4twp  4ogj  3ebp  4k77  3e5a
+4twp  4twp  2v7a  3pyy  3k5v  3mss  4ogj  2fvd  2wtv  3e5a
+1nvq  1nvq  3jvs  3jvr  2br1  2brb  4ogj  4eor  3e5a  3myg
+2zcq  2zcq  2zy1  2zcr  4ea2  3acw
+3utu  3utu  2zda  1oyt  3bv9  1bcu  1sqa  1mq6  1z6e  1o3f  1c5z
+2p4y  2p4y  3b1m  3fur  2yfe  3u9q  3ueu  3uev  3uex  3uew
+3myg  3myg  2wtv  3e5a  3up2  3uo4  2v7a  4twp  4ogj  2brb
+1sqa  1sqa  1owh  1o5b  1c5z  3kgp  1o3f  
+3dd0  3dd0  3ryj  2weg  3kwa  4jsz  3twp  
+2yki  2yki  3rlr  1yc1  3b27  2xdl  2yge  1o0h
+3g0w  3g0w  3b65  3b5r  3b68  1z95  1qkt
+2al5  2al5  1p1n  1syi  1p1q  4u4s
+4de1  4de1  4de3  4de2  3g31  3g2z
+3fv1  3fv1  3fv2  3gbb  4dld  1vso
+2p15  2p15  2pog  1qkt  2qe4  4mgd
+1mq6  1mq6  1z6e  2xbv  1lpg  2y5h  1o3f
+4f3c  4f3c  4f2w  1y6r  1nc1  1nc3
+1o3f  1o3f  1k1i  3gy4  4abg  1uto
+2vw5  2vw5  2wer  2iwx  2fxs  2yge
+3kr8  3kr8  4j3l  4j21  4kzu  4kzq
+2x00  2x00  2wn9  2xys  2wnc  2ymd  3wtj
+3u8n  3u8n  4qac  3u8k  3zdg  3wtj  2wn9
+3nw9  3nw9  3oe4  3oe5  3ozs  3ozt
+3zso  3pww  3prs  1g2k  3zso  4cig  3zsx  3zt2  3ao4
+2xb8  2xb8  3n76  3n86  4ciw  3n7a
+4w9h  4w9h  4w9i  4w9l  4w9c  4bkt
+3uex  3uex  3uew  3uev  3ueu  3nq9
+4gr0  4gr0  3nx7  3tsk  3ehy  3lka
+3p5o  3p5o  4ogj  4wiv  3u5j  4lzs
+1u1b  1u1b  1o0h  1w4o  3d6q  3dxg
+3o9i  3o9i  1eby  1g2k  2qnq  1a30  3prs  3pww
+5c2h  5c2h  3ui7  3uuo  5c28  4llx
+3uri  3uri  3prs  3pww  3wz8  2v00
+4rfm  4rfm  4qd6  3qgy  4m0y  4m0z  4twp  4ogj  3e5a
+4ty7  4ty7  4crc  4x6p  4cra  4cr9
+4agq  4agq  4agp  4agn  5a7b  5aba

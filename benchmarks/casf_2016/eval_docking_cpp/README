@@ -1,0 +1,12 @@
+Scripts for running GALigandDock on CASF2016 docking power. 
+1. evaluate the score of the complex structures
+run on cluster: sbatch sbatch_run_eval.sh
+run locally: python run_eval.py
+
+2. collect all the scores
+python gather_eval_results.py
+
+3. run docking power benchmark scripts
+cd power_docking
+./run_docking_power.sh
+

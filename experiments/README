@@ -1,0 +1,31 @@
+The following steps apply to both examples. The only difference is that E3L_6DO3 is using Enamine REAL library and Nav_5EK0 is using ZINC22 libaray. In E3L_6DO3, there are steps to generate mol2 files with mmff94 partial charges from SMILES while in Nav_5EK0, the steps are extracting mol2 files from ZINC22 provided tgz files. The different steps can be found in the 'scripts/run_all.sh'
+
+1. Generate the initial configure files for the project
+cd scripts
+python init_config.py
+
+2. Randomly choose params files from the drug-like centroids database for the first iteration:
+cd scripts
+python extract_starting_params.py
+
+3. Tar the folders containing the params files and move the Tar files to screeing/params, e.g. tar -cf validation_params_0.tar validation_params
+
+4. Generate the inputs file for virtual screening by running:
+cd screening
+python gen_screening_inputs.py, change the prefix to the name that matches the Tar params file, e.g. "train1"
+
+5. cd to the working directory, e.g. "train1" folder, and generate the slurm task array jobs and submission scripts:
+cd train1
+python gen_joblist_production.py
+sh submit_arrayjobs.sh
+
+6. Tar the folders in the outputs folder
+
+7. Go to scripts folder, change the 'curr_iter' to the current iteration number in 'run_all.sh' and run through the commands in this file. This will generate a folder containing new params files for the next iteration virtual screening. To be more specific, if curr_iter=1, the new params folder will be 'scratch/params/train2_params'
+
+8. Repeat 3, 4, 5, 6, 7 until a stop criterion has been met. 
+
+After the virtual screening runs, follow "scripts/post_analysis.sh" for post virtual screening analysis.
+
+
+A working example of running RosettaVS VSX mode is provided in E3L_6DO3. Following the above steps, the example will dock randomly select 10 or 20 molecules for E3L_6DO3 or Nav_5EK0 from databases/centroids. The params file can be found in the scratch/{project_folder}/params. Following step 3 and 4, it will dock the selected molecules. The expected output files, {project_name}_0_*.out and {project_name}_0_*.score.sc can be found in {project_folder}/screening/outputs. The running time is around 90-200 seconds per ligand.

@@ -1,0 +1,3 @@
+#python forward_screening_power.py -c CoreSet.dat -s ../GALigandDock_screening_relax_lig_simple_no_cst -t ./TargetInfo.dat -p 'negative' -o 'GALigandDock-Score-simple-relax-lig-nocst' > GALigandDockScreeningPower_simple_relax_lig_nocst.out
+#python forward_screening_power.py -c CoreSet.dat -s ../GALigandDock_screening_relax_lig_mcentropy_no_cst -t ./TargetInfo.dat -p 'negative' -o 'GALigandDock-Score-MCEntropy-RelaxLig-no-cst' > GALigandDockScreeningPower_MCEntropy_relax_lig_no_cst.out
+python reverse_screening_power.py -c CoreSet.dat -s ../GALigandDock_screening_relax_lig_simple_no_cst -l ./LigandInfo.dat -p 'negative' -o 'GALigandDock-Reverse-Score-Simple-RelaxLig-no-cst' > GALigandDockReverseScreeningPower_simple_relax_lig_no_cst.out

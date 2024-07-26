@@ -1,0 +1,28 @@
+<ROSETTASCRIPTS>
+  <SCOREFXNS>
+    <ScoreFunction name="genpot_soft" weights="beta_cart">
+      <Reweight scoretype="fa_rep" weight="0.2"/>
+    </ScoreFunction>
+    <ScoreFunction name="genpot" weights="beta_cart">
+      <Reweight scoretype="coordinate_constraint" weight="1.0"/>
+    </ScoreFunction>
+  </SCOREFXNS>
+
+  <TASKOPERATIONS>
+  </TASKOPERATIONS>
+
+  <FILTERS>
+  </FILTERS>
+
+  <MOVERS>
+    <GALigandDock name="dock" scorefxn="genpot_soft" scorefxn_relax="genpot"
+		  runmode="eval" turnon_flexscs_at_relax="1" contact_distance="0.0" entropy_method="Simple" >
+    </GALigandDock>
+
+  </MOVERS>
+
+  <PROTOCOLS>
+    <Add mover="dock"/>
+  </PROTOCOLS>
+  <OUTPUT scorefxn="genpot"/>
+</ROSETTASCRIPTS>

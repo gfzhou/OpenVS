@@ -1,0 +1,19 @@
+#Put params tar file for each target in "params_raw" folder.
+#The name of the tar file should be ${target_name}.tar, e.g.
+#ada.tar, comt.tar, etc.
+
+#DUD benchmark using RosettaVS VSX mode
+cd VSX
+python gen_input_files.py
+python gen_production_joblist.py
+sh submit_arrayjobs.sh
+#compute the AUC and Enrichment Factors
+python compute_auc.py
+
+#DUD benchmark using RosettaVS VSH mode
+cd VSH
+python gen_input_files.py
+python gen_production_joblist.py
+sh submit_arrayjobs.sh
+#compute the AUC and Enrichment Factors
+python compute_auc.py

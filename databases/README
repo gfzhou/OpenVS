@@ -1,0 +1,9 @@
+Please see the examples in this folder for directory architecture. 
+
+Here only includes mimimal database files to run with the working examples. Please download the full database following the links specified in the README.md for large-scale virtual screens.
+
+`centroids` is drug-like centroid library
+
+`real` is Enamine REAL library
+
+`zinc` is ZINC22 3D library

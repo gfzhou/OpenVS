@@ -1,0 +1,29 @@
+<ROSETTASCRIPTS>
+  <SCOREFXNS>
+    <ScoreFunction name="genpot_soft" weights="beta_cart">
+      <Reweight scoretype="fa_rep" weight="0.2"/>
+    </ScoreFunction>
+    <ScoreFunction name="genpot" weights="beta_cart"/>
+  </SCOREFXNS>
+
+  <TASKOPERATIONS>
+  </TASKOPERATIONS>
+
+  <FILTERS>
+  </FILTERS>
+
+  <MOVERS>
+    <GALigandDock name="dock" scorefxn="genpot_soft" scorefxn_relax="genpot"
+		  runmode="VSX" premin_ligand="1" final_exact_minimize="sc"
+		  multiple_ligands_file="%%liglist%%" estimate_dG="1" use_mean_maxRad="1" 
+      stdev_multiplier="1.5" nrelax="20" padding="4.0" cartmin_lig="0" >
+        <Stage repeats="5" npool="50" rmsdthreshold="2.0" pmut="0.2" maxiter="50" pack_cycles="25" smoothing="0.375" ramp_schedule="0.1,1.0"/>
+    </GALigandDock>
+
+  </MOVERS>
+
+  <PROTOCOLS>
+    <Add mover="dock"/>
+  </PROTOCOLS>
+  <OUTPUT scorefxn="genpot"/>
+</ROSETTASCRIPTS>

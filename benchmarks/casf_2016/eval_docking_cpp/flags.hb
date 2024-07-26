@@ -1,0 +1,4 @@
+-score::hb_don_strength hbdon_GENERIC_SC:1.45
+-score::hb_acc_strength hbacc_GENERIC_SP2SC:1.19
+-score::hb_acc_strength hbacc_GENERIC_SP3SC:1.19
+-score::hb_acc_strength hbacc_GENERIC_RINGSC:1.19
