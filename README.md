@@ -7,17 +7,22 @@ Software installation time is less than 2 hours on a regular desktop
 
 ### Install Rosetta
 Please follow the instructions in https://github.com/RosettaCommons/rosetta
+
 After the installation, run `export ROSETTAHOME=your_local_path`, remember to replace `your_local_path` with your the actual installation path.
 
 ### Install Dimorphite-DL 1.2.4
 Please follow the instructions in https://github.com/durrantlab/dimorphite_dl
+
 After the installation, run `export DIMORPHITE=your_local_path`, remember to replace `your_local_path` with your the actual installation path.
 
 ### Install OpenVS
-conda create -n openvs python=3.9
-conda install --file requirements.txt
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-pip install -e .
+`conda create -n openvs python=3.9`
+
+`conda install --file requirements.txt`
+
+`conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia`
+
+`pip install -e .`
 
 To install CSD Python API, follow https://downloads.ccdc.cam.ac.uk/documentation/API/installation_notes.html
 
