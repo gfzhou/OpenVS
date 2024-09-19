@@ -17,7 +17,7 @@
   <MOVERS>
     <GALigandDock name="dock" scorefxn="genpot_soft" scorefxn_relax="genpot"
 	    runmode="eval" turnon_flexscs_at_relax="1" contact_distance="0.0" estimate_buns="0"
-	    nativepdb="%%nativepdb%%" debug_report="1" >
+	    nativepdb="%%nativepdb%%" >
     </GALigandDock>
 
   </MOVERS>
