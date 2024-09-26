@@ -1,6 +1,9 @@
+'''Generate params from specified structure files.'''
+
 from __future__ import print_function
 
 import os,sys
+from typing import Literal, Optional, Union
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 import subprocess as sp
 from glob import glob
@@ -11,7 +14,12 @@ import tarfile
 from .db_utils import add_files_to_tarfile
 import multiprocessing as mp
 
-def run_cmd(cmd):
+def run_cmd(cmd) -> Union[tuple[str,int],Literal[0]]:
+    '''Run a command in a subprocess.
+    
+    Return 0 if success;
+    
+    return the command and returncode of the subprocess.'''
     p = sp.Popen(cmd, shell=True)
     p.communicate()
     ret = int(p.returncode)
@@ -19,9 +27,36 @@ def run_cmd(cmd):
         return " ".join(cmd), ret
     return ret
 
-def gen_params_from_folder(indir, outdir, mode='multiprocessing', 
-                            overwrite=False, nopdb=False, mol2gen_app=None, 
-                            multimol2=False, infer_atomtypes=False, queue='cpu'):
+
+def gen_params_from_folder(indir: str,
+                           outdir: str,
+                           mode: Literal['multiprocessing', 'slurm', 'local',
+                                         'debug'] = 'multiprocessing',
+                           overwrite: bool = False,
+                           nopdb: bool = False,
+                           mol2gen_app:Optional[str]=None,
+                           multimol2: bool = False,
+                           infer_atomtypes: bool = False,
+                           queue: str = 'cpu') -> None:
+    '''Search *.mol2 file in specified directory and generate params files.
+    
+    Params
+    ======
+    - indir: A directory contains mol2 files.
+    - outdir: Generated directory of parameters.
+    - mode = 'multiprocessing': Can be'multiprocessing', 'slurm', 'local',or 'debug'.
+    - overwrite = False: Whether to generate parms files when they are generated before.
+    - nopdb = False:Do not report pdb
+    - mol2gen_app = None: Path of the script to generate mol2 params files.Search in $ROSETTAHOME if it's None.
+    - multimol2 = False: If the input mol2 file has multiple structures
+    - infer_atomtypes = False: Infering the correct atom type for some special cases
+                        with a wrong input atom type
+    - queue = 'cpu': Destination queue for each worker jpb.
+
+    Returns
+    =======
+    None.
+    '''
     pattern = os.path.join(indir, "*.mol2")
     mol2fns = sorted(glob(pattern))
     print("Number of mol2fns:", len(mol2fns))
@@ -45,7 +80,7 @@ def gen_params_from_folder(indir, outdir, mode='multiprocessing',
         print(f"ROSETTAHOME: {rosettahome}")
         mol2gen_app = os.path.join(rosettahome,
                                 "source/scripts/python/public/generic_potential/mol2genparams.py")
-        
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
         print(f"Made dir: {outdir}")
@@ -69,7 +104,7 @@ def gen_params_from_folder(indir, outdir, mode='multiprocessing',
             cmd.append("--multimol2")
         if infer_atomtypes:
             cmd.append("--infer_atomtypes")
-        
+
         cmd = " ".join(cmd)
         #print(cmd)
         if mode == 'slurm':
@@ -104,7 +139,22 @@ def gen_params_from_folder(indir, outdir, mode='multiprocessing',
             results = pool.map(run_cmd, joblist)
         print(results)
 
-def gen_tarparams_from_list(paramsfns, outfn, overwrite=False):
+
+def gen_tarparams_from_list(paramsfns: set[str],
+                            outfn: str,
+                            overwrite: bool = False) -> None:
+    '''Compress a set of params files into a tar file.
+    
+    Params
+    ======
+    - paramsfns:A set of regular filenames to be compressed.
+    - outfn: Compressed tar filename.If the tar file exists already,update it;otherwise create a new one.
+    - overwrite = False: whether to regenerate a tar file when it exists.
+
+    Returns
+    =======
+    None.
+    '''
     if not overwrite and os.path.exists(outfn):
         print(f"{outfn} exists, skip.")
         return
@@ -112,8 +162,19 @@ def gen_tarparams_from_list(paramsfns, outfn, overwrite=False):
     n = add_files_to_tarfile(paramsfns, outfn, backup=False, overwrite=True)
 
 
-def ligandlist_from_tarparamsfn(intarfn, outfn):
-    ligandlines = []
+def ligandlist_from_tarparamsfn(intarfn: str, outfn: str) -> None:
+    '''Create a file.It contains ligand ids parsed from a tar file.
+    
+    Params
+    ======
+    - intarfn:A tar file.Compressed file in it may contains ligand ids.
+    - outfn: The output ligand list file.
+
+    Returns
+    =======
+    None.
+    '''
+    ligandlines:list[str] = []
     with tarfile.open(intarfn, 'r') as intar:
         raw_members = intar.getmembers()
         for member in raw_members:
