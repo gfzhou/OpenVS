@@ -1,29 +1,37 @@
+'''Clustering algoritms.'''
+
 import os,sys
 import numpy as np
 import torch
 from time import time
 
-def one_to_all_tanimoto(x, X):
+def one_to_all_tanimoto(x, X) -> torch.Tensor:
+    '''Calculate 1 - tanimoto similarity between vector x and vector set X.
+    
+    If x and X[:,i] are same,tanimoto[i] is 0;if x and X[:,1] are totally different,tanimoto[i] is 1;otherwise it's between 0~1.
+    
+    In clustering algoritms,two vectors' `distance` is shorter when they are more similar.
+    '''
     c = torch.sum(X*x, dim=1)
     a = torch.sum(X,dim=1)
     b = torch.sum(x)
-    
-    return 1-c.type(torch.float)/(a+b-c).type(torch.float)
-    
 
-def one_to_all_euclidean(x, X, dist_metric="euclidean"):
-    return torch.sqrt(torch.sum((X-x)**2,dim=1))
+    return 1-c.type(torch.float)/(a+b-c).type(torch.float)
+
+
+def one_to_all_euclidean(x, X, dist_metric="euclidean") -> torch.Tensor:
+    '''Calculate euclidean distance between vector x and vector set X.'''
+    return torch.sqrt(torch.sum((X - x)**2, dim=1))
 
 
 class BestFirstClustering():
-    def __init__(self, cutoff, dist_metric="tanimoto", dtype=torch.uint8):
+    def __init__(self, cutoff, dist_metric: str="tanimoto", dtype=torch.uint8):
 
+        self.cutoff = cutoff
         if dist_metric == "euclidean":
-            self.cutoff = cutoff
-            self.one_to_all_d = one_to_all_gpu_euclidean
+            self.one_to_all_d = one_to_all_euclidean
 
         elif dist_metric == 'tanimoto':
-            self.cutoff = cutoff
             self.one_to_all_d = one_to_all_tanimoto
         if torch.cuda.is_available():
             self.use_gpu = True
