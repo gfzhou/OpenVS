@@ -1,11 +1,16 @@
+'''Network model implementations to acclerate visual screening.'''
+
 import os,sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from openvs.args import VanillaModelArgs
 
+
 class VanillaNet(nn.Module):
-    def __init__(self, args: VanillaModelArgs ):
+    '''A classical one-to-one network.'''
+
+    def __init__(self, args: VanillaModelArgs):
         super().__init__()
         nBits = args.nBits
         nnodes = args.nnodes
@@ -24,7 +29,7 @@ class VanillaNet(nn.Module):
         self.dropout1 = nn.Dropout(dropoutfreq)
         self.dropout2 = nn.Dropout(dropoutfreq)
         self.out_activation = nn.Sigmoid()
-    
+
     def forward(self, x):
         x = F.relu(self.bn1(self.fc1(x)))
         x = self.dropout1(x)
@@ -36,8 +41,10 @@ class VanillaNet(nn.Module):
             x = self.out_activation(x)
         return x
 
+
 class VanillaNet2(nn.Module):
-    def __init__(self, args: VanillaModelArgs ):
+    '''A classical one-to-one network.'''
+    def __init__(self, args: VanillaModelArgs):
         super().__init__()
         nBits = args.nBits
         nnodes = args.nnodes
@@ -55,7 +62,7 @@ class VanillaNet2(nn.Module):
         self.bn3 = nn.BatchNorm1d(num_features=nnodes)
         self.dropout = nn.Dropout(dropoutfreq)
         self.out_activation = nn.Sigmoid()
-    
+
     def forward(self, x):
         x = F.relu(self.bn1(self.fc1(x)))
         x = self.dropout(x)
@@ -82,13 +89,13 @@ class VanillaNet3(nn.Module):
         self.fc_in = nn.Linear(nBits, nnodes)
         self.fcs = nn.ModuleList([nn.Linear(nnodes, nnodes) for i in range(self.nlayers)] )
         self.fc_out = nn.Linear(nnodes, 1)
-        
+
         self.bn1 = nn.BatchNorm1d(num_features=nnodes)
         self.bns = nn.ModuleList([nn.BatchNorm1d(num_features=nnodes) for i in range(self.nlayers)])
-        
+
         self.dropout = nn.Dropout(dropoutfreq)
         self.out_activation = nn.Sigmoid()
-    
+
     def forward(self, x):
         x = F.relu(self.bn1(self.fc_in(x)))
         x = self.dropout(x)
