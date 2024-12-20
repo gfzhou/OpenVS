@@ -1,4 +1,7 @@
+'''Filter,extract,compress and convert data files.'''
+
 import os,sys,io
+from typing import Any, Hashable
 import orjson
 import pandas as pd
 import tarfile
@@ -12,8 +15,20 @@ import dask.multiprocessing
 from distributed import Client, as_completed, wait
 from dask_jobqueue import SLURMCluster
 
-def dataframe2dict(df, key_column, value_column):
-    retdict={}
+def dataframe2dict(df:pd.DataFrame, key_column:Hashable, value_column:Hashable) -> dict[Hashable,list[Any]]:
+    '''Convert a DataFrame into a dict.
+    
+    Params
+    ======
+    - df:Input DataFrame.
+    - key_column:One of df's column name.
+    - value_column:One of df's column name.
+
+    Returns
+    =======
+    A dict.It's keys is items of df.key_column;It's values is items of df.value_column respectively.
+    '''
+    retdict: dict[Hashable, list[Any]]={}
     if key_column not in df.columns:
         raise Exception(f"{key_column} is a wrong column name.")
     if value_column not in df.columns:
@@ -23,19 +38,19 @@ def dataframe2dict(df, key_column, value_column):
     
     return retdict
 
-def map_raw3dfn_to_zincids_wrapper(inargs):
+def map_raw3dfn_to_zincids_wrapper(inargs:tuple[str,str,str,set[str]]) -> dict[str,set[str]]:
     tid4l, dbdir, indexdir, zincids = inargs
     return map_raw3dfn_to_zincids(tid4l, dbdir, indexdir, zincids)
 
-def map_raw3dfn_to_zincids_tid2l_wrapper(inargs):
+def map_raw3dfn_to_zincids_tid2l_wrapper(inargs:tuple[str,str,str,set[str]]) -> dict[str,set[str]]:
     tid2l, dbdir, indexdir, zincids = inargs
     return map_raw3dfn_to_zincids_tid2l(tid2l, dbdir, indexdir, zincids)
 
 
-def map_raw3dfn_to_zincids(tid4l:str, dbdir:str, indexdir:str, zincids:set ):
+def map_raw3dfn_to_zincids(tid4l:str, dbdir:str, indexdir:str, zincids:set[str]) -> dict[str,set[str]]:
     pattern  = os.path.join(indexdir, tid4l[:2], f"{tid4l}*.json")
     db_indexfns = glob(pattern)
-    zincids_to_3dfns = {}
+    zincids_to_3dfns:dict[str,str] = {}
     for db_indexfn in db_indexfns:
         with open(db_indexfn, 'rb') as infh:
             dbindex = orjson.loads(infh.read())
@@ -45,22 +60,21 @@ def map_raw3dfn_to_zincids(tid4l:str, dbdir:str, indexdir:str, zincids:set ):
         if len(zincids_to_3dfns) == len(zincids):
             break
     
-    mol2fn_to_zincids ={}
-    for zincid in zincids_to_3dfns:
-        mol2fn = zincids_to_3dfns[zincid]
+    mol2fn_to_zincids:dict[str,set[str]] ={}
+    for mol2fn, zincid in zincids_to_3dfns.items():
         if mol2fn != "" and os.path.exists(mol2fn):
-            mol2fn_to_zincids.setdefault(mol2fn, set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(mol2fn, set()).update([zincid])
         elif os.path.exists( os.path.join(dbdir, tid4l[:2], mol2fn) ):
-            mol2fn_to_zincids.setdefault(os.path.join(dbdir, tid4l[:2], mol2fn), set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(os.path.join(dbdir, tid4l[:2], mol2fn), set()).update([zincid])
         else:
-            mol2fn_to_zincids.setdefault(f"NA_{tid4l}", set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(f"NA_{tid4l}", set()).update([zincid])
     
     return mol2fn_to_zincids
 
-def map_raw3dfn_to_zincids_tid2l(tid2l:str, dbdir:str, indexdir:str, zincids:set ):
+def map_raw3dfn_to_zincids_tid2l(tid2l:str, dbdir:str, indexdir:str, zincids:set[str]) -> dict[str,set[str]]:
     pattern  = os.path.join(indexdir, tid2l, f"{tid2l}*.json")
     db_indexfns = glob(pattern)
-    zincids_to_3dfns = {}
+    zincids_to_3dfns:dict[str,str] = {}
     for db_indexfn in db_indexfns:
         with open(db_indexfn, 'rb') as infh:
             dbindex = orjson.loads(infh.read())
@@ -70,25 +84,53 @@ def map_raw3dfn_to_zincids_tid2l(tid2l:str, dbdir:str, indexdir:str, zincids:set
         if len(zincids_to_3dfns) == len(zincids):
             break
     
-    mol2fn_to_zincids ={}
-    for zincid in zincids_to_3dfns:
-        mol2fn = zincids_to_3dfns[zincid]
+    mol2fn_to_zincids:dict[str,set[str]] ={}
+    for mol2fn,zincid in zincids_to_3dfns.items():
         if mol2fn != "" and os.path.exists(mol2fn):
-            mol2fn_to_zincids.setdefault(mol2fn, set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(mol2fn, set()).update([zincid])
         elif os.path.exists( os.path.join(dbdir, tid2l, mol2fn) ):
-            mol2fn_to_zincids.setdefault(os.path.join(dbdir, tid2l, mol2fn), set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(os.path.join(dbdir, tid2l, mol2fn), set()).update([zincid])
         else:
-            mol2fn_to_zincids.setdefault(f"NA_{tid2l}", set([])).update([zincid])
+            mol2fn_to_zincids.setdefault(f"NA_{tid2l}", set()).update([zincid])
     
     return mol2fn_to_zincids
 
-def extract_tarmember_to_folder_wrapper(inargs):
+def extract_tarmember_to_folder_wrapper(inargs:tuple[set[str],str,str,str,str]) -> int:
+    '''Wrapper for `extract_tarmember_to_folder`.
+    
+    Params
+    ======
+    - inargs: Packed args for `extract_tarmember_to_folder`
+        - zincids: A set of zinc ids to be extracted.
+        - intarfn: Input tar filename.
+        - outdir: Extract directory path.
+        - extra = "": Extra infix for saving as a different extracted file.
+        - logpath = "": Directory for log file saving.
+
+    Returns
+    =======
+    Number of successful extracted files.
+    '''
     zincids, intarfn, outdir, extra, logpath = inargs
     return extract_tarmember_to_folder(zincids, intarfn, outdir, extra, logpath)
 
-def extract_tarmember_to_folder( zincids, intarfn, outdir, extra="", logpath=""):
+def extract_tarmember_to_folder( zincids:set[str], intarfn:str, outdir:str, extra:str="", logpath:str="") -> int:
+    '''Filter and extract .
+    
+    Params
+    ======
+    - zincids: A set of zinc ids to be extracted.
+    - intarfn: Input tar filename.
+    - outdir: Extract directory path.
+    - extra = "": Extra infix for saving as a different extracted file.
+    - logpath = "": Directory for log file saving.
+
+    Returns
+    =======
+    Number of successful extracted files.
+    '''
     n = 0
-    extracted=set([])
+    extracted:set[str]=set()
     with tarfile.open(intarfn, 'r') as intarfh:
         for member in intarfh.getmembers():
             zincid = os.path.basename(member.name).split(".")[0]
@@ -119,7 +161,7 @@ def extract_tarmember_to_folder( zincids, intarfn, outdir, extra="", logpath="")
             outfname = outfname + ".failed.txt"
             
             outfn = os.path.join(logpath, outfname)
-            content = []
+            content:list[str] = []
             for zincid in set(zincids) - extracted:
                 content.append(f"{zincid}\n")
             with open(outfn, 'w') as outfh:
@@ -130,11 +172,38 @@ def extract_tarmember_to_folder( zincids, intarfn, outdir, extra="", logpath="")
     return n
 
 
-def extract_tarparams_to_folder_wrapper(inargs):
+def extract_tarparams_to_folder_wrapper(inargs:tuple[set[str],str,str,str]) -> int:
+    '''Wrapper for `extract_tarparams_to_folder`.
+    
+    Params
+    ======
+    - inargs: Packed args for `extract_tarparams_to_folder`.
+        - zincids: A set of zinc ids(in filenames) to be extracted.
+        - intarfn: Input tar filename.
+        - outdir: Extract directory path.
+        - extra = "": Extra infix for saving as a different extracted file.
+
+    Returns
+    =======
+    Number of successful extracted file.
+    '''
     zincids, intarfn, outdir, extra = inargs
     return extract_tarparams_to_folder(zincids, intarfn, outdir, extra)
 
-def extract_tarparams_to_folder( zincids, intarfn, outdir, extra=""):
+def extract_tarparams_to_folder( zincids:set[str], intarfn:str, outdir:str, extra:str=""):
+    '''Filter and extract `*.params` files in tar file according to their filename.
+    
+    Params
+    ======
+    - zincids: A set of zinc ids(in filenames) to be extracted.
+    - intarfn: Input tar filename.
+    - outdir: Extract directory path.
+    - extra = "": Extra infix for saving as a different extracted file.
+
+    Returns
+    =======
+    Number of successful extracted files.
+    '''
     n = 0
     with tarfile.open(intarfn, 'r') as intarfh:
         for member in intarfh.getmembers():
@@ -163,8 +232,20 @@ def extract_tarparams_to_folder( zincids, intarfn, outdir, extra=""):
         print(f"Successfully extracted {n} members to {outdir}")
     return n
 
-# add tar members to another tar file
-def add_tarmember_to_tarfile(zincids, intarfn, outtarfn, backup=True):
+def add_tarmember_to_tarfile(zincids: set[str], intarfn:str, outtarfn:str, backup:bool=True) -> int:
+    '''Add tar members to another tar file.
+    
+    Params
+    ======
+    - zincids: A set of zinc ids(in filenames) to be re-compressed.
+    - intarfn: Input tar filename.
+    - outdir: Re-compressed tar filename.
+    - backup = True: Whether to create a `backups` directory and copy last created tar file into it.
+
+    Returns
+    =======
+    Number of successful re-compressed files.
+    '''
     if os.path.exists(outtarfn):
         tar_mode = "a"
         if backup:
@@ -195,8 +276,20 @@ def add_tarmember_to_tarfile(zincids, intarfn, outtarfn, backup=True):
         print(f"Successfully added {n} members to {outtarfn}")
     return n
 
-# add regular files to tar file
-def add_files_to_tarfile(regularfns, outtarfn, backup=True, overwrite=False):
+def add_files_to_tarfile(regularfns:set[str], outtarfn:str, backup:bool=True, overwrite:bool=False) -> int:
+    '''Add regular files into a tar file.
+    
+    Params
+    ======
+    - regularfns: A set of regular filenames to be compressed.
+    - outtarfn: Compressed tar filename.If the tar file exists already,update it;otherwise create a new one.
+    - backup = True: Whether to create a `backups` directory and copy last created tar file into it.
+    - overwrite = False: whether to regenerate a tar file when it exists.
+
+    Returns
+    =======
+    Number of successful compressed files.
+    '''
     if os.path.exists(outtarfn):
         tar_mode = "a"
         if backup:
